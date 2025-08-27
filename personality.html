@@ -10,7 +10,6 @@
     th { background: #f2f2f2; }
     .highlight { background: #c8facc !important; }
 
-    /* ตารางสัตว์ */
     .matrix td {
       width: 150px; height: 120px;
       border: 1px solid #999;
@@ -30,16 +29,14 @@
       background-size: 70px auto;
       background-repeat: no-repeat;
       background-position: center;
-      opacity: 0.15;   /* ความจาง */
+      opacity: 0.15;
     }
 
-    /* เส้นแบ่งรูปบวก (+) */
     .matrix tr:nth-child(2) td { border-bottom: 3px solid black; }
     .matrix tr:nth-child(3) td { border-top: 3px solid black; }
     .matrix td:nth-child(2) { border-right: 3px solid black; }
     .matrix td:nth-child(3) { border-left: 3px solid black; }
 
-    /* 4 สัตว์ */
     .buffalo::before { background-image: url("https://em-content.zobj.net/thumbs/240/apple/354/water-buffalo_1f403.png"); }
     .eagle::before   { background-image: url("https://em-content.zobj.net/thumbs/240/apple/354/eagle_1f985.png"); }
     .bear::before    { background-image: url("https://em-content.zobj.net/thumbs/240/apple/354/bear_1f43b.png"); }
@@ -129,13 +126,14 @@
     <td><span>T1-P2</span></td>
   </tr>
   <tr>
-    <td class="eagle"><span>อินทรี<br>(A1-P1)</span></td>
+    <td class="eagle"><span>อินทรีย์<br>(A1-P1)</span></td>
     <td><span>A2-P1</span></td>
     <td><span>T2-P1</span></td>
     <td class="mouse"><span>หนู<br>(T1-P1)</span></td>
   </tr>
 </table>
 
+<!-- JavaScript -->
 <script>
 function calculateResult() {
   const rows = document.querySelectorAll("#inputTable tbody tr");
@@ -155,24 +153,36 @@ function calculateResult() {
     document.getElementById("sum"+key).textContent = sums[key];
   }
 
-  // หาค่ามากสุดจากกลุ่ม 1 (A1,A2,T1,T2)
+  // กลุ่ม 1: A1, A2, T1, T2
   let group1 = ["A1","A2","T1","T2"];
-  let max1 = group1.reduce((a,b)=> sums[a]>=sums[b]?a:b);
+  let maxVal1 = Math.max(...group1.map(k => sums[k]));
+  let maxGroup1 = group1.filter(k => sums[k] === maxVal1);
 
-  // หาค่ามากสุดจากกลุ่ม 2 (C1,C2,P1,P2)
+  // กลุ่ม 2: C1, C2, P1, P2
   let group2 = ["C1","C2","P1","P2"];
-  let max2 = group2.reduce((a,b)=> sums[a]>=sums[b]?a:b);
+  let maxVal2 = Math.max(...group2.map(k => sums[k]));
+  let maxGroup2 = group2.filter(k => sums[k] === maxVal2);
 
-  let position = max1 + "-" + max2;
-  document.getElementById("finalPos").textContent = position;
+  // สร้างตำแหน่งทั้งหมด
+  let positions = [];
+  maxGroup1.forEach(g1 => {
+    maxGroup2.forEach(g2 => {
+      positions.push(g1 + "-" + g2);
+    });
+  });
+
+  // แสดงตำแหน่งทั้งหมด
+  document.getElementById("finalPos").textContent = positions.join(", ");
 
   // ล้าง highlight เดิม
   document.querySelectorAll("#matrixTable td").forEach(td => td.classList.remove("highlight"));
 
-  // highlight ช่องตรงตำแหน่ง
-  let target = Array.from(document.querySelectorAll("#matrixTable td"))
-                    .find(td => td.textContent.includes(position));
-  if (target) target.classList.add("highlight");
+  // highlight ตำแหน่ง
+  positions.forEach(pos => {
+    let target = Array.from(document.querySelectorAll("#matrixTable td"))
+                      .find(td => td.textContent.includes(pos));
+    if (target) target.classList.add("highlight");
+  });
 }
 </script>
 
